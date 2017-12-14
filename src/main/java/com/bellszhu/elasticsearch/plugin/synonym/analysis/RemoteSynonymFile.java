@@ -174,16 +174,16 @@ public class RemoteSynonymFile implements SynonymFile {
 		try {
 			response = httpclient.execute(head);
 			if (response.getStatusLine().getStatusCode() == 200) { // 返回200 才做操作
-				if (!response.getLastHeader("Last-Modified").getValue()
-						.equalsIgnoreCase(lastModified)
-						|| !response.getLastHeader("ETag").getValue()
-								.equalsIgnoreCase(eTags)) {
-
-					lastModified = response.getLastHeader("Last-Modified") == null ? null
-							: response.getLastHeader("Last-Modified")
-									.getValue();
-					eTags = response.getLastHeader("ETag") == null ? null
-							: response.getLastHeader("ETag").getValue();
+				String _lastModified = response.getLastHeader("'Last-Modified") == null ? null : response.getLastHeader("Last-Modified").getValue();
+				String _eTag = response.getLastHeader("Etag") == null ? null : response.getLastHeader("Etag").getValue();
+				
+				if (_lastModified == null || response.getLastHeader("ETag") == null) {
+					return false;
+				} else if (_lastModified.equalsIgnoreCase(lastModified) && _eTag.equalsIgnoreCase(eTags)) {
+					return false;
+				} else {
+					lastModified = _lastModified;
+					eTags = _eTag;
 					return true;
 				}
 			} else if (response.getStatusLine().getStatusCode() == 304) {

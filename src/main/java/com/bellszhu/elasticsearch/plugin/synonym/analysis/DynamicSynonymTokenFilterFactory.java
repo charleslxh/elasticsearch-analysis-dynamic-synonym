@@ -99,9 +99,6 @@ public class DynamicSynonymTokenFilterFactory extends
 
 				AnalysisRegistry.getSettingsFromIndexSettings(indexSettings, AnalysisRegistry.INDEX_ANALYSIS_TOKENIZER + "." + tokenizerName));
 
-
-
-
 		Analyzer analyzer = new Analyzer() {
 			@Override
 			protected TokenStreamComponents createComponents(String fieldName) {
@@ -125,8 +122,6 @@ public class DynamicSynonymTokenFilterFactory extends
 				interval, interval, TimeUnit.SECONDS);
 
 	}
-
-
 
 	@Override
 	public TokenStream create(TokenStream tokenStream) {
