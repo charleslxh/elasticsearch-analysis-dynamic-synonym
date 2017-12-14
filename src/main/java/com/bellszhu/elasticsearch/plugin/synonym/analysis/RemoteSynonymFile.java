@@ -3,12 +3,14 @@
  */
 package com.bellszhu.elasticsearch.plugin.synonym.analysis;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.synonym.SolrSynonymParser;
@@ -173,10 +175,11 @@ public class RemoteSynonymFile implements SynonymFile {
 		CloseableHttpResponse response = null;
 		try {
 			response = httpclient.execute(head);
+			
 			if (response.getStatusLine().getStatusCode() == 200) { // 返回200 才做操作
 				String _lastModified = response.getLastHeader("'Last-Modified") == null ? null : response.getLastHeader("Last-Modified").getValue();
 				String _eTag = response.getLastHeader("Etag") == null ? null : response.getLastHeader("Etag").getValue();
-				
+
 				if (_lastModified == null || response.getLastHeader("ETag") == null) {
 					return false;
 				} else if (_lastModified.equalsIgnoreCase(lastModified) && _eTag.equalsIgnoreCase(eTags)) {

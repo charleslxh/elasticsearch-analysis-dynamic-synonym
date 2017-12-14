@@ -9,7 +9,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.Logger;
 
@@ -55,7 +56,7 @@ public class DynamicSynonymTokenFilterFactory extends
             });
 
 	private volatile ScheduledFuture<?> scheduledFuture;
-
+	
 	private final String location;
 	private final boolean ignoreCase;
 	private final boolean expand;
@@ -64,6 +65,13 @@ public class DynamicSynonymTokenFilterFactory extends
 
 	private SynonymMap synonymMap;
 	private Map<DynamicSynonymFilter, Integer> dynamicSynonymFilters = new WeakHashMap<DynamicSynonymFilter, Integer>();
+	
+	private boolean isUrl(String str) {
+		String regex = "(http|ftp|sftp)(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(str);
+		return matcher.matches();
+	}
 
 	public DynamicSynonymTokenFilterFactory(
 			IndexSettings indexSettings,
@@ -81,7 +89,7 @@ public class DynamicSynonymTokenFilterFactory extends
 			throw new IllegalArgumentException(
 					"dynamic synonym requires `synonyms_path` to be configured");
 		}
-
+		
 		this.interval = settings.getAsInt("interval", 60);
 		this.ignoreCase = settings.getAsBoolean("ignore_case", false);
 		this.expand = settings.getAsBoolean("expand", true);
@@ -109,7 +117,7 @@ public class DynamicSynonymTokenFilterFactory extends
 		};
 
 		SynonymFile synonymFile;
-		if (location.startsWith("http://") || location.startsWith("https://")) {
+		if (this.isUrl(location)) {
 			synonymFile = new RemoteSynonymFile(env, analyzer, expand, format,
 					location);
 		} else {
