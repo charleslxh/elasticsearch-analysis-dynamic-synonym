@@ -67,7 +67,7 @@ public class DynamicSynonymTokenFilterFactory extends
 	private Map<DynamicSynonymFilter, Integer> dynamicSynonymFilters = new WeakHashMap<DynamicSynonymFilter, Integer>();
 	
 	private boolean isUrl(String str) {
-		String regex = "(http|ftp|sftp)(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";
+		String regex = "^(https?|ftps?|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(str);
 		return matcher.matches();
